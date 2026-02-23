@@ -1,0 +1,26 @@
+{
+  "ArunC": {
+    "email": "chandrasekarana@student.rcdsb.on.ca",
+    "password": "pbkdf2:sha256:260000$QY7mSYtBGzIonEaT$82913392a3dcfff34ad0d6a1498ea817d534b16d6f158cadde91ad3037000dac",
+    "pin": "283283",
+    "role": "admin"
+  },
+  "cooluser123": {
+    "email": "you@example.com",
+    "password": "pbkdf2:sha256:260000$8W1GksWPXo6aWgys$4c2f4597c72aba0c1f5e75369e9ca1d8e63e6adf24163d1f6eab4ada51b27da6",
+    "pin": "",
+    "role": "user"
+  },
+  "HeyMan!": {
+    "email": "orange@gmail.com",
+    "password": "pbkdf2:sha256:260000$fzilwtJZdwOnxvvh$876b65d00e5f6c4cae15cc1e7db2cc7df7db9c896471c900a621488bf4764591",
+    "pin": "",
+    "role": "user"
+  },
+  "VijiN": {
+    "email": "nambi.vijilaxmi@gmail.com",
+    "password": "pbkdf2:sha256:260000$FRNNhShjNQqPKVYe$e19281a0332b513db220f91e444b754334d9efe34a0298f1025e98d576fbac1c",
+    "pin": "438438",
+    "role": "admin"
+  }
+}

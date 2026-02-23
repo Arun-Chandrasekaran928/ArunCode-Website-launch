@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArunCode IDE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #090b10;
+      --bg2:       #0d1117;
+      --bg3:       #161b22;
+      --blue:      #00cfff;
+      --blue-dim:  #00557a;
+      --blue-mid:  #0099cc;
+      --blue-glow: rgba(0,207,255,0.08);
+      --green:     #39ff14;
+      --amber:     #ffb300;
+      --red:       #ff4444;
+      --purple:    #c084fc;
+      --border:    #1a2332;
+      --text:      #8ba8c0;
+      --text-bright: #cde0f0;
+      --mono:      'JetBrains Mono', monospace;
+      --ui:        'Share Tech Mono', monospace;
+      --title:     'Orbitron', sans-serif;
+      --sidebar-w: 220px;
+      --topbar-h:  40px;
+      --tabs-h:    36px;
+      --console-h: 180px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--ui);
+      font-size: 13px;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: default;
+    }
+
+    /* scanlines */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    @keyframes fadeIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes blink  { 0%,100%{opacity:1} 50%{opacity:0} }
+    @keyframes pulse-blue {
+      0%,100% { box-shadow: 0 0 4px var(--blue-dim); }
+      50%      { box-shadow: 0 0 14px var(--blue); }
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      height: var(--topbar-h);
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 1rem;
+      gap: 1rem;
+      flex-shrink: 0;
+      animation: fadeIn 0.5s ease both;
+    }
+
+    .topbar-brand {
+      font-family: var(--title);
+      font-size: 0.95rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: var(--blue);
+      text-shadow: 0 0 8px var(--blue-dim);
+      white-space: nowrap;
+    }
+
+    .topbar-divider {
+      width: 1px;
+      height: 18px;
+      background: var(--border);
+    }
+
+    .topbar-menu {
+      display: flex;
+      gap: 0.1rem;
+    }
+
+    .menu-btn {
+      background: none;
+      border: none;
+      color: var(--text);
+      font-family: var(--ui);
+      font-size: 11px;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .menu-btn:hover { background: var(--blue-glow); color: var(--blue); }
+
+    .topbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 10px;
+      color: var(--blue-dim);
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: blink 2s ease infinite;
+    }
+
+    .btn-home {
+      background: transparent;
+      border: 1px solid var(--blue-dim);
+      color: var(--blue);
+      font-family: var(--ui);
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-home:hover { background: var(--blue-glow); border-color: var(--blue); box-shadow: 0 0 8px var(--blue-dim); }
+
+    /* ── MAIN LAYOUT ── */
+    .workspace {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      animation: fadeIn 0.5s 0.1s ease both;
+    }
+
+    .sidebar-header {
+      padding: 0.5rem 0.8rem;
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--blue-dim);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-action {
+      background: none;
+      border: none;
+      color: var(--blue-dim);
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      transition: color 0.2s;
+      padding: 0 2px;
+    }
+    .sidebar-action:hover { color: var(--blue); }
+
+    .file-tree {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.4rem 0;
+    }
+
+    .file-tree::-webkit-scrollbar { width: 4px; }
+    .file-tree::-webkit-scrollbar-track { background: transparent; }
+    .file-tree::-webkit-scrollbar-thumb { background: var(--border); }
+
+    .tree-folder, .tree-file {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 4px 0.8rem;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.1s, color 0.1s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      user-select: none;
+    }
+
+    .tree-folder { color: var(--blue); }
+    .tree-folder:hover { background: var(--blue-glow); }
+
+    .tree-file { color: var(--text); padding-left: 2rem; }
+    .tree-file:hover { background: var(--blue-glow); color: var(--text-bright); }
+    .tree-file.active { background: rgba(0,207,255,0.12); color: var(--blue); border-right: 2px solid var(--blue); }
+
+    .tree-icon { font-size: 12px; flex-shrink: 0; }
+
+    .sidebar-footer {
+      padding: 0.5rem 0.8rem;
+      border-top: 1px solid var(--border);
+      font-size: 10px;
+      color: var(--blue-dim);
+    }
+
+    /* ── EDITOR AREA ── */
+    .editor-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: fadeIn 0.5s 0.2s ease both;
+    }
+
+    /* tabs */
+    .tabs {
+      height: var(--tabs-h);
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-end;
+      overflow-x: auto;
+      flex-shrink: 0;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+
+    .tab {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0 1rem;
+      height: 30px;
+      font-size: 11px;
+      color: var(--text);
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-bottom: none;
+      white-space: nowrap;
+      transition: all 0.15s;
+      position: relative;
+      top: 1px;
+      background: var(--bg3);
+      margin-right: 2px;
+    }
+    .tab:hover { color: var(--text-bright); background: var(--bg); }
+    .tab.active {
+      color: var(--blue);
+      background: var(--bg);
+      border-color: var(--border);
+      border-bottom-color: var(--bg);
+    }
+
+    .tab-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+    }
+    .tab-dot.py     { background: #4ec9b0; }
+    .tab-dot.js     { background: #ffb300; }
+    .tab-dot.html   { background: #e06c75; }
+    .tab-dot.css    { background: #61afef; }
+    .tab-dot.txt    { background: #888; }
+    .tab-dot.json   { background: #c084fc; }
+
+    .tab-close {
+      background: none;
+      border: none;
+      color: #444;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1;
+      padding: 0 2px;
+      transition: color 0.15s;
+    }
+    .tab-close:hover { color: var(--red); }
+
+    /* editor + gutter */
+    .editor-wrap {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .gutter {
+      width: 48px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      padding: 1rem 0;
+      text-align: right;
+      font-size: 12px;
+      font-family: var(--mono);
+      color: #2a3a4a;
+      line-height: 1.6;
+      overflow: hidden;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .gutter-num {
+      display: block;
+      padding-right: 8px;
+    }
+
+    .editor {
+      flex: 1;
+      background: var(--bg);
+      color: var(--text-bright);
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 1rem;
+      border: none;
+      outline: none;
+      resize: none;
+      overflow-y: auto;
+      tab-size: 4;
+      white-space: pre;
+      overflow-x: auto;
+      caret-color: var(--blue);
+    }
+
+    .editor::-webkit-scrollbar { width: 6px; height: 6px; }
+    .editor::-webkit-scrollbar-track { background: transparent; }
+    .editor::-webkit-scrollbar-thumb { background: var(--border); }
+
+    /* ── STATUSBAR ── */
+    .statusbar {
+      height: 22px;
+      background: var(--blue-dim);
+      display: flex;
+      align-items: center;
+      padding: 0 0.8rem;
+      gap: 1.5rem;
+      font-size: 10px;
+      color: rgba(255,255,255,0.6);
+      flex-shrink: 0;
+    }
+
+    .statusbar span { color: rgba(255,255,255,0.9); }
+
+    /* ── CONSOLE ── */
+    .console {
+      height: var(--console-h);
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      animation: fadeIn 0.5s 0.3s ease both;
+    }
+
+    .console-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg3);
+      flex-shrink: 0;
+    }
+
+    .console-tab {
+      padding: 4px 14px;
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--text);
+      cursor: pointer;
+      border-right: 1px solid var(--border);
+      transition: all 0.15s;
+    }
+    .console-tab.active { color: var(--blue); background: var(--bg2); }
+    .console-tab:hover  { color: var(--text-bright); }
+
+    .console-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-left: auto;
+      padding: 0 0.5rem;
+    }
+
+    .run-btn {
+      background: transparent;
+      border: 1px solid var(--blue-dim);
+      color: var(--blue);
+      font-family: var(--ui);
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 2px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .run-btn:hover {
+      background: var(--blue-glow);
+      border-color: var(--blue);
+      box-shadow: 0 0 10px var(--blue-dim);
+      animation: pulse-blue 1.5s ease infinite;
+    }
+
+    .clear-btn {
+      background: none;
+      border: none;
+      color: #333;
+      font-size: 10px;
+      cursor: pointer;
+      font-family: var(--ui);
+      transition: color 0.2s;
+    }
+    .clear-btn:hover { color: var(--text); }
+
+    .console-output {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem 1rem;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .console-output::-webkit-scrollbar { width: 4px; }
+    .console-output::-webkit-scrollbar-thumb { background: var(--border); }
+
+    .out-line { color: var(--text-bright); }
+    .out-info { color: var(--blue); }
+    .out-warn { color: var(--amber); }
+    .out-err  { color: var(--red); }
+    .out-ok   { color: var(--green); }
+    .out-dim  { color: #333; }
+
+    /* new file modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      width: 320px;
+    }
+
+    .modal h3 {
+      font-family: var(--ui);
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--blue);
+      margin-bottom: 1rem;
+    }
+
+    .modal input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--blue);
+      font-family: var(--mono);
+      font-size: 13px;
+      padding: 0.5rem 0.7rem;
+      outline: none;
+      margin-bottom: 1rem;
+      caret-color: var(--blue);
+    }
+    .modal input:focus { border-color: var(--blue-mid); }
+
+    .modal-btns { display: flex; gap: 0.5rem; justify-content: flex-end; }
+    .modal-btns button {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--ui);
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 4px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .modal-btns .btn-confirm { border-color: var(--blue-dim); color: var(--blue); }
+    .modal-btns button:hover { background: var(--blue-glow); }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-brand">ARUNCODE IDE</div>
+    <div class="topbar-divider"></div>
+    <div class="topbar-menu">
+      <button class="menu-btn" onclick="newFile()">FILE +</button>
+      <button class="menu-btn" onclick="saveFile()">SAVE</button>
+      <button class="menu-btn" onclick="runCode()">▶ RUN</button>
+    </div>
+    <div class="topbar-right">
+      <span class="status-dot"></span>
+      <span>v5.0.0</span>
+      <a class="btn-home" href="../static/launcher.html">⌂ HOME</a>
+    </div>
+  </div>
+
+  <div class="workspace">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <span>EXPLORER</span>
+        <div style="display:flex;gap:4px;">
+          <button class="sidebar-action" onclick="newFile()" title="New File">+</button>
+          <button class="sidebar-action" onclick="newFolder()" title="New Folder">⊞</button>
+        </div>
+      </div>
+      <div class="file-tree" id="file-tree"></div>
+      <div class="sidebar-footer">
+        <div id="file-count">0 files</div>
+      </div>
+    </div>
+
+    <!-- EDITOR + CONSOLE -->
+    <div class="editor-area">
+
+      <!-- TABS -->
+      <div class="tabs" id="tabs">
+        <div style="padding:0 1rem;font-size:11px;color:#222;display:flex;align-items:center;height:30px;">
+          No file open
+        </div>
+      </div>
+
+      <!-- EDITOR -->
+      <div class="editor-wrap">
+        <div class="gutter" id="gutter"></div>
+        <textarea class="editor" id="editor"
+          placeholder="// Open a file from the explorer or create a new one"
+          spellcheck="false"
+          oninput="onEdit()"
+          onkeydown="handleKey(event)"
+          onscroll="syncGutter()"
+        ></textarea>
+      </div>
+
+      <!-- STATUSBAR -->
+      <div class="statusbar">
+        <div>Ln <span id="status-ln">1</span>, Col <span id="status-col">1</span></div>
+        <div>Lang: <span id="status-lang">—</span></div>
+        <div id="status-msg" style="margin-left:auto;color:var(--green)"></div>
+      </div>
+
+      <!-- CONSOLE -->
+      <div class="console">
+        <div class="console-tabs">
+          <div class="console-tab active">OUTPUT</div>
+          <div class="console-tab" onclick="">PROBLEMS</div>
+          <div class="console-toolbar">
+            <button class="run-btn" onclick="runCode()">▶ RUN</button>
+            <button class="clear-btn" onclick="clearConsole()">CLEAR</button>
+          </div>
+        </div>
+        <div class="console-output" id="console-output">
+          <div class="out-dim">// ArunCode IDE — Output console ready</div>
+          <div class="out-dim">// Open a file and press RUN or use the menu</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NEW FILE MODAL -->
+  <div class="modal-overlay" id="modal-new">
+    <div class="modal">
+      <h3>// NEW FILE</h3>
+      <input type="text" id="new-filename" placeholder="filename.py" onkeydown="if(event.key==='Enter')confirmNew()">
+      <div class="modal-btns">
+        <button onclick="closeModal()">CANCEL</button>
+        <button class="btn-confirm" onclick="confirmNew()">CREATE</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── STATE ──
+    const files = {};       // { name: content }
+    const folders = [];     // folder names
+    let activeFile = null;
+    let tabs = [];
+
+    // ── DEFAULT FILES ──
+    const defaults = {
+      "main.py": `# ArunCode_Term — main.py
+# Created by Arun Chandrasekaran
+
+def greet(name):
+    print(f"Hello, {name}!")
+
+def main():
+    greet("ArunCode")
+    print("Version: 5.0.0")
+    print("Status: Running")
+
+if __name__ == "__main__":
+    main()
+`,
+      "README.md": `# ArunCode_Term
+
+Created by **Arun Chandrasekaran**.
+Version: 5.0.0 | Status: Running
+
+## About
+ArunCode_Term is a terminal application built with Python.
+It took 2 months to develop.
+`,
+      "style.css": `/* ArunCode Styles */
+:root {
+  --green: #39ff14;
+  --bg: #0a0e0a;
+}
+
+body {
+  background: var(--bg);
+  color: var(--green);
+  font-family: monospace;
+}
+`
+    };
+
+    Object.entries(defaults).forEach(([name, content]) => {
+      files[name] = content;
+    });
+
+    // ── SYNTAX HIGHLIGHT COLORS (via lang detection) ──
+    const langMap = {
+      py: 'Python', js: 'JavaScript', html: 'HTML',
+      css: 'CSS', json: 'JSON', md: 'Markdown',
+      txt: 'Text', sh: 'Shell', rs: 'Rust'
+    };
+
+    function getExt(name) {
+      return name.split('.').pop().toLowerCase();
+    }
+
+    function getLang(name) {
+      return langMap[getExt(name)] || 'Text';
+    }
+
+    function getTabColor(name) {
+      const ext = getExt(name);
+      const colors = { py:'#4ec9b0', js:'#ffb300', html:'#e06c75', css:'#61afef', json:'#c084fc', md:'#aaa', sh:'#39ff14' };
+      return colors[ext] || '#888';
+    }
+
+    // ── RENDER FILE TREE ──
+    function renderTree() {
+      const tree = document.getElementById('file-tree');
+      const fc   = document.getElementById('file-count');
+      tree.innerHTML = '';
+
+      // Project folder
+      const projDiv = document.createElement('div');
+      projDiv.className = 'tree-folder';
+      projDiv.innerHTML = `<span class="tree-icon">▾</span><span>ArunCode</span>`;
+      tree.appendChild(projDiv);
+
+      // Files
+      Object.keys(files).sort().forEach(name => {
+        const div = document.createElement('div');
+        div.className = 'tree-file' + (name === activeFile ? ' active' : '');
+        div.innerHTML = `<span class="tree-icon">${fileIcon(name)}</span><span>${name}</span>`;
+        div.onclick = () => openFile(name);
+        tree.appendChild(div);
+      });
+
+      fc.textContent = `${Object.keys(files).length} file${Object.keys(files).length !== 1 ? 's' : ''}`;
+    }
+
+    function fileIcon(name) {
+      const ext = getExt(name);
+      const icons = { py:'🐍', js:'📜', html:'🌐', css:'🎨', json:'{ }', md:'📝', sh:'⚡', rs:'⚙' };
+      return icons[ext] || '📄';
+    }
+
+    // ── TABS ──
+    function renderTabs() {
+      const tabsEl = document.getElementById('tabs');
+      tabsEl.innerHTML = '';
+
+      if (tabs.length === 0) {
+        tabsEl.innerHTML = '<div style="padding:0 1rem;font-size:11px;color:#222;display:flex;align-items:center;height:30px;">No file open</div>';
+        return;
+      }
+
+      tabs.forEach(name => {
+        const div = document.createElement('div');
+        div.className = 'tab' + (name === activeFile ? ' active' : '');
+
+        const dot = document.createElement('span');
+        dot.className = `tab-dot ${getExt(name)}`;
+        dot.style.background = getTabColor(name);
+
+        const label = document.createElement('span');
+        label.textContent = name;
+
+        const close = document.createElement('button');
+        close.className = 'tab-close';
+        close.textContent = '×';
+        close.onclick = (e) => { e.stopPropagation(); closeTab(name); };
+
+        div.appendChild(dot);
+        div.appendChild(label);
+        div.appendChild(close);
+        div.onclick = () => openFile(name);
+        tabsEl.appendChild(div);
+      });
+    }
+
+    // ── OPEN FILE ──
+    function openFile(name) {
+      if (activeFile) files[activeFile] = document.getElementById('editor').value;
+      activeFile = name;
+      if (!tabs.includes(name)) tabs.push(name);
+
+      const editor = document.getElementById('editor');
+      editor.value = files[name] || '';
+      editor.focus();
+
+      document.getElementById('status-lang').textContent = getLang(name);
+      updateGutter();
+      renderTabs();
+      renderTree();
+      updateCursor();
+    }
+
+    function closeTab(name) {
+      if (name === activeFile) files[name] = document.getElementById('editor').value;
+      tabs = tabs.filter(t => t !== name);
+
+      if (activeFile === name) {
+        activeFile = tabs.length ? tabs[tabs.length - 1] : null;
+        if (activeFile) {
+          document.getElementById('editor').value = files[activeFile];
+          document.getElementById('status-lang').textContent = getLang(activeFile);
+        } else {
+          document.getElementById('editor').value = '';
+          document.getElementById('status-lang').textContent = '—';
+        }
+        updateGutter();
+      }
+      renderTabs();
+      renderTree();
+    }
+
+    // ── GUTTER ──
+    function updateGutter() {
+      const editor  = document.getElementById('editor');
+      const gutter  = document.getElementById('gutter');
+      const lines   = (editor.value || '').split('\n').length;
+      gutter.innerHTML = Array.from({length: lines}, (_, i) =>
+        `<span class="gutter-num">${i + 1}</span>`
+      ).join('');
+      syncGutter();
+    }
+
+    function syncGutter() {
+      const editor = document.getElementById('editor');
+      const gutter = document.getElementById('gutter');
+      gutter.scrollTop = editor.scrollTop;
+    }
+
+    function onEdit() {
+      updateGutter();
+      updateCursor();
+      if (activeFile) files[activeFile] = document.getElementById('editor').value;
+    }
+
+    function updateCursor() {
+      const editor = document.getElementById('editor');
+      const text   = editor.value.substring(0, editor.selectionStart);
+      const lines  = text.split('\n');
+      document.getElementById('status-ln').textContent  = lines.length;
+      document.getElementById('status-col').textContent = lines[lines.length - 1].length + 1;
+    }
+
+    // ── TAB KEY ──
+    function handleKey(e) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const editor = document.getElementById('editor');
+        const start  = editor.selectionStart;
+        const end    = editor.selectionEnd;
+        editor.value = editor.value.substring(0, start) + '    ' + editor.value.substring(end);
+        editor.selectionStart = editor.selectionEnd = start + 4;
+        onEdit();
+      }
+      updateCursor();
+    }
+
+    // ── NEW FILE ──
+    function newFile() {
+      document.getElementById('modal-new').classList.add('show');
+      const input = document.getElementById('new-filename');
+      input.value = '';
+      setTimeout(() => input.focus(), 50);
+    }
+
+    function closeModal() {
+      document.getElementById('modal-new').classList.remove('show');
+    }
+
+    function confirmNew() {
+      const name = document.getElementById('new-filename').value.trim();
+      if (!name) return;
+      if (!files[name]) files[name] = `# ${name}\n`;
+      closeModal();
+      openFile(name);
+      renderTree();
+    }
+
+    function newFolder() {
+      log('out-info', '// Folders coming in a future update!');
+    }
+
+    // ── SAVE ──
+    function saveFile() {
+      if (!activeFile) { log('out-warn', '// No file open to save.'); return; }
+      files[activeFile] = document.getElementById('editor').value;
+      const msg = document.getElementById('status-msg');
+      msg.textContent = `✔ Saved ${activeFile}`;
+      log('out-ok', `✔ Saved: ${activeFile}`);
+      setTimeout(() => msg.textContent = '', 2000);
+    }
+
+    // ── RUN ──
+    function runCode() {
+      if (!activeFile) { log('out-warn', '// No file open to run.'); return; }
+      const code = document.getElementById('editor').value;
+      const ext  = getExt(activeFile);
+
+      log('out-dim', `─────────────────────────────`);
+      log('out-info', `▶ Running: ${activeFile}`);
+
+      if (ext === 'py') {
+        simulatePython(code);
+      } else if (ext === 'js') {
+        simulateJS(code);
+      } else if (ext === 'html') {
+        log('out-warn', '// HTML files open in the browser — use Live Preview instead.');
+      } else if (ext === 'md') {
+        log('out-info', '// Markdown preview coming soon!');
+      } else {
+        log('out-warn', `// Cannot run .${ext} files directly.`);
+      }
+    }
+
+    function simulatePython(code) {
+      const lines = code.split('\n');
+      const prints = [];
+
+      lines.forEach(line => {
+        const m = line.match(/^\s*print\((.+)\)\s*$/);
+        if (m) {
+          let val = m[1].trim();
+          val = val.replace(/f?"([^"]*)"/, '$1').replace(/f?'([^']*)'/, '$1');
+          // simple f-string substitution
+          val = val.replace(/\{name\}/g, 'ArunCode').replace(/\{version\}/g, '5.0.0');
+          prints.push(val);
+        }
+      });
+
+      if (prints.length) {
+        prints.forEach(p => log('out-line', p));
+      } else {
+        log('out-dim', '// (No print() output detected — this is a simulated runtime)');
+      }
+      log('out-ok', '✔ Process exited with code 0');
+    }
+
+    function simulateJS(code) {
+      const output = [];
+      const fakeConsole = { log: (...args) => output.push(args.join(' ')) };
+      try {
+        const fn = new Function('console', code);
+        fn(fakeConsole);
+        output.forEach(o => log('out-line', o));
+        if (!output.length) log('out-dim', '// (No console.log output)');
+        log('out-ok', '✔ Process exited with code 0');
+      } catch(e) {
+        log('out-err', `✖ ${e.message}`);
+      }
+    }
+
+    // ── CONSOLE HELPERS ──
+    function log(cls, msg) {
+      const out = document.getElementById('console-output');
+      const div = document.createElement('div');
+      div.className = cls;
+      div.textContent = msg;
+      out.appendChild(div);
+      out.scrollTop = out.scrollHeight;
+    }
+
+    function clearConsole() {
+      document.getElementById('console-output').innerHTML =
+        '<div class="out-dim">// Console cleared</div>';
+    }
+
+    // ── INIT ──
+    renderTree();
+    openFile('main.py');
+    updateGutter();
+
+    // click outside modal to close
+    document.getElementById('modal-new').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    // update cursor on click
+    document.getElementById('editor').addEventListener('click', updateCursor);
+    document.getElementById('editor').addEventListener('keyup', updateCursor);
+  </script>
+
+</body>
+</html>

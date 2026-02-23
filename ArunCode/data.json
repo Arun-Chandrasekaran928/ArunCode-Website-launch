@@ -1,0 +1,34 @@
+[
+    {
+        "username": "Arun C.",
+        "password": "927927",
+        "sudo": "True",
+        "usertype": "Admin",
+        "fs": {
+            "files": [],
+            "folders": {
+                "Plan": {
+                    "files": [
+                        "hello.txt",
+                        "hi.txt"
+                    ],
+                    "folders": {}
+                }
+            }
+        },
+        "file_contents": {
+            "hello.txt": "",
+            "hi.txt": ""
+        }
+    },
+    {
+        "username": "Parthy C.",
+        "password": "839839",
+        "sudo": "True",
+        "usertype": "Security Manager",
+        "fs": {
+            "files": [],
+            "folders": {}
+        }
+    }
+]

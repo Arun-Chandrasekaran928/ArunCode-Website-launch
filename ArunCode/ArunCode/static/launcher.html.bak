@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArunCode_Term</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #0a0e0a;
+      --bg2:       #0f140f;
+      --green:     #39ff14;
+      --green-dim: #1a7a06;
+      --green-mid: #22c40a;
+      --amber:     #ffb300;
+      --red:       #ff3c3c;
+      --blue:      #00cfff;
+      --border:    #1e3a1e;
+      --text:      #c8e6c8;
+      --mono:      'Share Tech Mono', monospace;
+      --display:   'VT323', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 14px;
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.12) 2px,
+        rgba(0,0,0,0.12) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    @keyframes flicker {
+      0%,100% { opacity: 1; }
+      92% { opacity: 1; }
+      93% { opacity: 0.85; }
+      94% { opacity: 1; }
+      96% { opacity: 0.9; }
+      97% { opacity: 1; }
+    }
+    body { animation: flicker 8s infinite; }
+
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 4px var(--green-dim); }
+      50%      { box-shadow: 0 0 16px var(--green); }
+    }
+    @keyframes scanDown {
+      0%   { top: -4px; }
+      100% { top: 100%; }
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20%      { transform: translateX(-8px); }
+      40%      { transform: translateX(8px); }
+      60%      { transform: translateX(-5px); }
+      80%      { transform: translateX(5px); }
+    }
+
+    .glow {
+      color: var(--green);
+      text-shadow: 0 0 4px var(--green), 0 0 12px var(--green-mid), 0 0 30px var(--green-dim);
+    }
+
+    .cursor-block {
+      display: inline-block;
+      width: 9px;
+      height: 15px;
+      background: var(--green);
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+      box-shadow: 0 0 6px var(--green);
+    }
+
+    /* ══════════════════════════════
+       SCREENS
+    ══════════════════════════════ */
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; flex-direction: column; }
+
+    /* ══════════════════════════════
+       LOGIN SCREEN
+    ══════════════════════════════ */
+    #screen-login {
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 480px;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      animation: fadeIn 0.8s ease both;
+    }
+
+    .login-topbar {
+      background: #0d1a0d;
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 11px;
+      color: var(--green-dim);
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .dot-red   { background: #ff3c3c; }
+    .dot-amber { background: #ffb300; }
+    .dot-green { background: #39ff14; }
+
+    .login-topbar-title {
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 12px;
+      color: var(--green-mid);
+      letter-spacing: 1px;
+    }
+
+    .login-inner { padding: 2rem; }
+
+    .ascii-small {
+      font-size: 9px;
+      line-height: 1.2;
+      color: var(--green-mid);
+      text-shadow: 0 0 6px var(--green-dim);
+      white-space: pre;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .login-title {
+      font-family: var(--display);
+      font-size: 2.4rem;
+      color: var(--green);
+      text-shadow: 0 0 10px var(--green), 0 0 30px var(--green-dim);
+      text-align: center;
+      letter-spacing: 2px;
+      margin-bottom: 0.3rem;
+    }
+
+    .login-subtitle {
+      text-align: center;
+      font-size: 11px;
+      color: var(--green-dim);
+      letter-spacing: 1px;
+      margin-bottom: 2rem;
+    }
+
+    /* steps */
+    .steps {
+      display: flex;
+      gap: 0;
+      margin-bottom: 1.8rem;
+      border: 1px solid var(--border);
+    }
+
+    .step {
+      flex: 1;
+      text-align: center;
+      padding: 0.4rem 0.2rem;
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--green-dim);
+      border-right: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+    .step:last-child { border-right: none; }
+    .step.active { background: rgba(57,255,20,0.07); color: var(--green); }
+    .step.done   { background: rgba(57,255,20,0.04); color: var(--green-mid); }
+
+    /* form */
+    .form-step { display: none; }
+    .form-step.active { display: block; }
+
+    .field {
+      margin-bottom: 1.2rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--green-dim);
+      margin-bottom: 0.4rem;
+    }
+
+    .field input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 14px;
+      padding: 0.6rem 0.8rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      caret-color: var(--green);
+    }
+
+    .field input:focus {
+      border-color: var(--green-mid);
+      box-shadow: 0 0 8px var(--green-dim);
+    }
+
+    .field input::placeholder { color: var(--green-dim); opacity: 0.6; }
+
+    .field-hint {
+      font-size: 10px;
+      color: var(--green-dim);
+      margin-top: 0.3rem;
+    }
+
+    .error-msg {
+      font-size: 11px;
+      color: var(--red);
+      text-align: center;
+      margin-bottom: 0.8rem;
+      min-height: 16px;
+    }
+
+    .error-msg.shake { animation: shake 0.4s ease; }
+
+    .btn-primary {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--green-dim);
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 2px;
+      padding: 0.7rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      margin-top: 0.4rem;
+    }
+
+    .btn-primary:hover {
+      background: rgba(57,255,20,0.1);
+      border-color: var(--green);
+      box-shadow: 0 0 12px var(--green-dim);
+      text-shadow: 0 0 6px var(--green);
+    }
+
+    /* verification code inputs */
+    .code-inputs {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: center;
+      margin-bottom: 1.2rem;
+    }
+
+    .code-inputs input {
+      width: 46px;
+      height: 54px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--green);
+      font-family: var(--display);
+      font-size: 2rem;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      caret-color: transparent;
+    }
+
+    .code-inputs input:focus {
+      border-color: var(--green-mid);
+      box-shadow: 0 0 8px var(--green-dim);
+    }
+
+    .verify-hint {
+      text-align: center;
+      font-size: 11px;
+      color: var(--green-dim);
+      margin-bottom: 1rem;
+    }
+
+    .resend-link {
+      color: var(--green-mid);
+      cursor: pointer;
+      border-bottom: 1px dashed var(--green-dim);
+      transition: color 0.2s;
+    }
+    .resend-link:hover { color: var(--green); }
+
+    /* ══════════════════════════════
+       BOOT SCREEN
+    ══════════════════════════════ */
+    #screen-boot {
+      justify-content: center;
+      align-items: flex-start;
+      padding: 3rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .boot-scan {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(transparent, var(--green), transparent);
+      animation: scanDown 2s linear infinite;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .boot-log {
+      width: 100%;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .boot-line {
+      font-size: 13px;
+      line-height: 2;
+      opacity: 0;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .boot-line.show { animation: fadeUp 0.2s ease forwards; }
+
+    .boot-ok     { color: var(--green); }
+    .boot-warn   { color: var(--amber); }
+    .boot-info   { color: var(--text); }
+    .boot-system { color: var(--blue); }
+
+    .boot-progress {
+      margin-top: 1.5rem;
+      font-size: 11px;
+      color: var(--green-dim);
+    }
+
+    .progress-bar-wrap {
+      height: 4px;
+      background: var(--border);
+      margin-top: 0.4rem;
+      width: 100%;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* ══════════════════════════════
+       DASHBOARD SCREEN
+    ══════════════════════════════ */
+    #screen-dash {
+      flex-direction: column;
+    }
+
+    /* top bar */
+    .dash-topbar {
+      background: #0d1a0d;
+      border-bottom: 1px solid var(--border);
+      padding: 0.5rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-size: 11px;
+      color: var(--green-dim);
+      animation: fadeIn 0.5s ease both;
+    }
+
+    .dash-topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .dash-logo {
+      font-family: var(--display);
+      font-size: 1.6rem;
+      color: var(--green);
+      text-shadow: 0 0 8px var(--green-dim);
+      letter-spacing: 1px;
+    }
+
+    .dash-nav a {
+      color: var(--green-dim);
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 1px;
+      padding: 0 0.6rem;
+      border-right: 1px solid var(--border);
+      transition: color 0.2s;
+    }
+    .dash-nav a:last-child { border-right: none; }
+    .dash-nav a:hover { color: var(--green); }
+
+    .dash-topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .dash-user {
+      color: var(--green-mid);
+      font-size: 12px;
+    }
+
+    .btn-logout {
+      background: transparent;
+      border: 1px solid #7a1a1a;
+      color: var(--red);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-logout:hover { background: rgba(255,60,60,0.1); box-shadow: 0 0 8px #7a1a1a; }
+
+    /* dash main */
+    .dash-main {
+      padding: 2rem;
+      flex: 1;
+      animation: fadeIn 0.8s 0.2s ease both;
+    }
+
+    /* welcome banner */
+    .welcome-banner {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-banner::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(to left, rgba(57,255,20,0.03), transparent);
+      pointer-events: none;
+    }
+
+    .welcome-greeting {
+      font-family: var(--display);
+      font-size: 2.6rem;
+      color: var(--green);
+      text-shadow: 0 0 10px var(--green), 0 0 30px var(--green-dim);
+      letter-spacing: 2px;
+    }
+
+    .welcome-sub {
+      font-size: 12px;
+      color: var(--green-dim);
+      margin-top: 0.3rem;
+      letter-spacing: 1px;
+    }
+
+    /* terminal prompt */
+    .terminal-window {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      margin-bottom: 2rem;
+    }
+
+    .terminal-titlebar {
+      background: #0d1a0d;
+      border-bottom: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 11px;
+      color: var(--green-dim);
+    }
+
+    .terminal-body {
+      padding: 1rem 1.2rem;
+      font-size: 13px;
+      min-height: 120px;
+    }
+
+    .terminal-line { line-height: 2; }
+    .t-prompt { color: var(--green-mid); }
+    .t-cmd    { color: var(--green); }
+    .t-out    { color: var(--text); padding-left: 1rem; }
+    .t-dim    { color: var(--green-dim); }
+
+    .terminal-input-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.2rem 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .t-prompt-label { color: var(--green-mid); font-size: 13px; white-space: nowrap; }
+
+    .terminal-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 13px;
+      caret-color: var(--green);
+    }
+
+    /* quick links grid */
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .link-card {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 1.2rem 1.4rem;
+      text-decoration: none;
+      display: block;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .link-card:hover {
+      border-color: var(--green-mid);
+      background: rgba(57,255,20,0.04);
+      box-shadow: 0 0 12px var(--green-dim);
+    }
+
+    .link-card-icon {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+      color: var(--green);
+      text-shadow: 0 0 6px var(--green-dim);
+    }
+
+    .link-card-title {
+      font-size: 13px;
+      color: var(--green);
+      margin-bottom: 0.2rem;
+    }
+
+    .link-card-desc {
+      font-size: 11px;
+      color: var(--green-dim);
+    }
+
+    .link-card-arrow {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      color: var(--green-dim);
+      font-size: 12px;
+      transition: transform 0.2s;
+    }
+
+    .link-card:hover .link-card-arrow { transform: translate(2px, -2px); color: var(--green); }
+
+    /* status strip */
+    .status-strip {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 0.7rem 1.2rem;
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: var(--green-dim);
+      animation: pulse 3s ease infinite;
+    }
+
+    .status-strip span { color: var(--green-mid); }
+
+    /* footer */
+    footer {
+      margin-top: auto;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--green-dim);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════
+       SCREEN 1: LOGIN
+  ══════════════════════════════ -->
+  <div id="screen-login" class="screen active">
+    <div class="login-box">
+
+      <div class="login-topbar">
+        <span class="dot dot-red"></span>
+        <span class="dot dot-amber"></span>
+        <span class="dot dot-green"></span>
+        <span class="login-topbar-title">aruncode_term — login</span>
+      </div>
+
+      <div class="login-inner">
+        <div class="ascii-small">
+  ______
+ /     |
+/      |____
+\      |    |
+ \_____|____|</div>
+
+        <div class="login-title">ArunCode_Term</div>
+        <div class="login-subtitle">// SECURE ACCESS TERMINAL</div>
+
+        <!-- Step indicators -->
+        <div class="steps">
+          <div class="step active" id="step-ind-1">01 IDENTIFY</div>
+          <div class="step" id="step-ind-2">02 AUTH</div>
+          <div class="step" id="step-ind-3">03 VERIFY</div>
+        </div>
+
+        <!-- Error message -->
+        <div class="error-msg" id="error-msg"></div>
+
+        <!-- STEP 1: Email + Username -->
+        <div class="form-step active" id="form-step-1">
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="input-email" placeholder="you@example.com" autocomplete="email">
+          </div>
+          <div class="field">
+            <label>Username</label>
+            <input type="text" id="input-username" placeholder="arun" autocomplete="username">
+          </div>
+          <button class="btn-primary" onclick="goStep2()">CONTINUE →</button>
+        </div>
+
+        <!-- STEP 2: Password -->
+        <div class="form-step" id="form-step-2">
+          <div class="field">
+            <label>Password</label>
+            <input type="password" id="input-password" placeholder="••••••••" autocomplete="current-password">
+            <div class="field-hint">Logging in as: <span id="display-user" style="color:var(--green-mid)"></span></div>
+          </div>
+          <button class="btn-primary" onclick="goStep3()">AUTHENTICATE →</button>
+        </div>
+
+        <!-- STEP 3: Verification code -->
+        <div class="form-step" id="form-step-3">
+          <div class="verify-hint">
+            A 6-digit code has been sent to<br>
+            <span style="color:var(--green-mid)" id="display-email"></span>
+          </div>
+          <div class="code-inputs" id="code-inputs">
+            <input type="text" maxlength="1" inputmode="numeric" onkeyup="codeNav(this,0)">
+            <input type="text" maxlength="1" inputmode="numeric" onkeyup="codeNav(this,1)">
+            <input type="text" maxlength="1" inputmode="numeric" onkeyup="codeNav(this,2)">
+            <input type="text" maxlength="1" inputmode="numeric" onkeyup="codeNav(this,3)">
+            <input type="text" maxlength="1" inputmode="numeric" onkeyup="codeNav(this,4)">
+            <input type="text" maxlength="1" inputmode="numeric" onkeyup="codeNav(this,5)">
+          </div>
+          <div class="verify-hint">
+            Didn't receive it? <span class="resend-link" onclick="resendCode()">Resend code</span>
+          </div>
+          <button class="btn-primary" onclick="verifyCode()">VERIFY & ENTER →</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════
+       SCREEN 2: BOOT
+  ══════════════════════════════ -->
+  <div id="screen-boot" class="screen">
+    <div class="boot-scan"></div>
+    <div class="boot-log" id="boot-log">
+      <div class="boot-progress">
+        LOADING ARUNCODE_TERM...
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="boot-progress-bar"></div>
+        </div>
+      </div>
+      <br>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════
+       SCREEN 3: DASHBOARD
+  ══════════════════════════════ -->
+  <div id="screen-dash" class="screen">
+
+    <div class="dash-topbar">
+      <div class="dash-topbar-left">
+        <div class="dash-logo">ArunCode_Term</div>
+        <nav class="dash-nav">
+          <a href="./about/versions/version.html">Versions</a>
+          <a href="./about/versions/versionhistory.html">History</a>
+          <a href="./about/about.html">About</a>
+        </nav>
+      </div>
+      <div class="dash-topbar-right">
+        <span class="dash-user">● <span id="dash-username"></span></span>
+        <button class="btn-logout" onclick="logout()">LOGOUT</button>
+      </div>
+    </div>
+
+    <div class="dash-main">
+
+      <!-- Welcome -->
+      <div class="welcome-banner">
+        <div class="welcome-greeting">Welcome back, <span id="welcome-name"></span> <span class="cursor-block"></span></div>
+        <div class="welcome-sub">// SESSION STARTED — ARUNCODE_TERM v5.0.0 — ALL SYSTEMS NOMINAL</div>
+      </div>
+
+      <!-- Quick links -->
+      <div class="links-grid">
+        <a class="link-card" href="./about/versions/versionhistory.html">
+          <div class="link-card-icon">📋</div>
+          <div class="link-card-title">Version History</div>
+          <div class="link-card-desc">Browse all releases & ratings</div>
+          <span class="link-card-arrow">↗</span>
+        </a>
+        <a class="link-card" href="./about/versions/version.html">
+          <div class="link-card-icon">📦</div>
+          <div class="link-card-title">Versions</div>
+          <div class="link-card-desc">Changelogs, fixes & downloads</div>
+          <span class="link-card-arrow">↗</span>
+        </a>
+        <a class="link-card" href="./about/about.html">
+          <div class="link-card-icon">👤</div>
+          <div class="link-card-title">About</div>
+          <div class="link-card-desc">Creator & ArunCode_Term story</div>
+          <span class="link-card-arrow">↗</span>
+        </a>
+        <a class="link-card" href="#">
+          <div class="link-card-icon">⚙</div>
+          <div class="link-card-title">Settings</div>
+          <div class="link-card-desc">Configure your terminal</div>
+          <span class="link-card-arrow">↗</span>
+        </a>
+      </div>
+
+      <!-- Terminal -->
+      <div class="terminal-window">
+        <div class="terminal-titlebar">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-amber"></span>
+          <span class="dot dot-green"></span>
+          <span style="margin-left:0.8rem;">terminal — aruncode_term</span>
+        </div>
+        <div class="terminal-body" id="terminal-output">
+          <div class="terminal-line"><span class="t-prompt">aruncode@term:~$</span> <span class="t-cmd">status</span></div>
+          <div class="terminal-line t-out">▸ ArunCode_Term v5.0.0 — RUNNING</div>
+          <div class="terminal-line t-out">▸ Python ≥ 3.1.0 — OK</div>
+          <div class="terminal-line t-out">▸ Rating: 95.0%</div>
+          <div class="terminal-line t-dim">Type a command below. Try: <span style="color:var(--green-mid)">help</span></div>
+        </div>
+        <div class="terminal-input-row">
+          <span class="t-prompt-label">aruncode@term:~$</span>
+          <input class="terminal-input" type="text" id="terminal-input" placeholder="enter command..." onkeydown="handleCmd(event)" autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+
+      <!-- Status strip -->
+      <div class="status-strip">
+        <div>system: <span>ONLINE</span></div>
+        <div>version: <span>5.0.0</span></div>
+        <div>rating: <span>95.0%</span></div>
+        <div>python: <span>≥ 3.1.0</span></div>
+        <div>build: <span>STABLE</span></div>
+        <div>session: <span id="session-time">--:--</span></div>
+      </div>
+
+    </div>
+
+    <footer>
+      <div>ArunCode_Term © 2026 — Arun Chandrasekaran</div>
+      <div>system: <span style="color:var(--green-mid)">ONLINE</span> &nbsp;|&nbsp; build: <span style="color:var(--green-mid)">STABLE</span></div>
+    </footer>
+  </div>
+
+
+  <script>
+    // ── STATE ──
+    let currentUsername = '';
+    let currentEmail    = '';
+    let sessionStart    = null;
+
+    // ── UTILITIES ──
+    function showError(msg) {
+      const el = document.getElementById('error-msg');
+      el.textContent = msg;
+      el.style.color = '';
+      el.classList.remove('shake');
+      void el.offsetWidth;
+      el.classList.add('shake');
+    }
+
+    function showInfo(msg) {
+      const el = document.getElementById('error-msg');
+      el.style.color = 'var(--amber)';
+      el.textContent = msg;
+      setTimeout(() => { el.textContent = ''; el.style.color = ''; }, 2500);
+    }
+
+    function clearError() {
+      document.getElementById('error-msg').textContent = '';
+    }
+
+    function setLoading(btn, loading) {
+      btn.disabled    = loading;
+      btn.textContent = loading ? 'PLEASE WAIT...' : btn.dataset.label;
+    }
+
+    function setStep(n) {
+      [1,2,3].forEach(i => {
+        document.getElementById('form-step-' + i).classList.toggle('active', i === n);
+        const ind = document.getElementById('step-ind-' + i);
+        ind.classList.remove('active','done');
+        if (i === n) ind.classList.add('active');
+        if (i < n)  ind.classList.add('done');
+      });
+      clearError();
+    }
+
+    // ── STEP 1: collect email + username (client-side only, no sensitive check) ──
+    function goStep2() {
+      const email    = document.getElementById('input-email').value.trim();
+      const username = document.getElementById('input-username').value.trim();
+      if (!email || !email.includes('@')) { showError('Please enter a valid email address.'); return; }
+      if (!username) { showError('Please enter your username.'); return; }
+      currentEmail    = email;
+      currentUsername = username;
+      document.getElementById('display-user').textContent  = username;
+      document.getElementById('display-email').textContent = email;
+      setStep(2);
+    }
+
+    // ── STEP 2: send credentials to Flask, which verifies and sends the code ──
+    async function goStep3() {
+      const pw  = document.getElementById('input-password').value;
+      const btn = document.querySelector('#form-step-2 .btn-primary');
+      if (pw.length < 6) { showError('Password must be at least 6 characters.'); return; }
+
+      setLoading(btn, true);
+      try {
+        const res  = await fetch('/api/login', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ email: currentEmail, username: currentUsername, password: pw })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          setStep(3);
+          document.querySelector('#code-inputs input').focus();
+        } else {
+          showError(data.error || 'Login failed.');
+        }
+      } catch {
+        showError('Could not reach server. Is app.py running?');
+      } finally {
+        setLoading(btn, false);
+      }
+    }
+
+    // ── Code input auto-advance ──
+    function codeNav(input, idx) {
+      const inputs = document.querySelectorAll('#code-inputs input');
+      if (input.value && idx < 5) inputs[idx + 1].focus();
+      if (!input.value && idx > 0 && event.key === 'Backspace') inputs[idx - 1].focus();
+    }
+
+    // ── Resend code ──
+    async function resendCode() {
+      const inputs = document.querySelectorAll('#code-inputs input');
+      inputs.forEach(i => i.value = '');
+      inputs[0].focus();
+      try {
+        const res  = await fetch('/api/resend', { method: 'POST' });
+        const data = await res.json();
+        showInfo(data.ok ? 'New code sent!' : (data.error || 'Could not resend.'));
+      } catch {
+        showInfo('Could not reach server.');
+      }
+    }
+
+    // ── STEP 3: verify the code ──
+    async function verifyCode() {
+      const inputs = document.querySelectorAll('#code-inputs input');
+      const code   = Array.from(inputs).map(i => i.value).join('');
+      const btn    = document.querySelector('#form-step-3 .btn-primary');
+      if (code.length < 6) { showError('Please enter the full 6-digit code.'); return; }
+
+      setLoading(btn, true);
+      try {
+        const res  = await fetch('/api/verify', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ code })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          currentUsername = data.username;
+          startBoot();
+        } else {
+          showError(data.error || 'Verification failed.');
+        }
+      } catch {
+        showError('Could not reach server. Is app.py running?');
+      } finally {
+        setLoading(btn, false);
+      }
+    }
+
+    // ── BOOT SEQUENCE ──
+    function startBoot() {
+      showScreen('screen-boot');
+
+      const lines = [
+        { text: '[  OK  ] Initialising ArunCode_Term kernel...',               cls: 'boot-ok',     delay: 200  },
+        { text: '[  OK  ] Loading environment variables...',                   cls: 'boot-ok',     delay: 500  },
+        { text: '[  OK  ] Connecting to ArunCode runtime...',                  cls: 'boot-ok',     delay: 900  },
+        { text: '[ INFO ] Python 3.1.0 runtime detected.',                     cls: 'boot-info',   delay: 1200 },
+        { text: '[ INFO ] Checking version integrity... v5.0.0 OK',            cls: 'boot-info',   delay: 1600 },
+        { text: '[ WARN ] Only 2 downloads recorded — keep sharing!',          cls: 'boot-warn',   delay: 2000 },
+        { text: '[  OK  ] Authentication verified.',                           cls: 'boot-ok',     delay: 2400 },
+        { text: '[  OK  ] Session token generated.',                           cls: 'boot-ok',     delay: 2700 },
+        { text: '[ SYS  ] All systems nominal. Rating: 95.0%',                 cls: 'boot-system', delay: 3100 },
+        { text: `[ SYS  ] Welcome, ${currentUsername}. Loading dashboard...`,  cls: 'boot-system', delay: 3500 },
+      ];
+
+      const log = document.getElementById('boot-log');
+      const bar = document.getElementById('boot-progress-bar');
+
+      lines.forEach((l, i) => {
+        setTimeout(() => {
+          const div = document.createElement('div');
+          div.className = `boot-line ${l.cls}`;
+          div.textContent = l.text;
+          log.appendChild(div);
+          void div.offsetWidth;
+          div.classList.add('show');
+          bar.style.width = ((i + 1) / lines.length * 100) + '%';
+        }, l.delay);
+      });
+
+      setTimeout(() => {
+        sessionStart = Date.now();
+        startSessionTimer();
+        showScreen('screen-dash');
+        document.getElementById('dash-username').textContent = currentUsername;
+        document.getElementById('welcome-name').textContent  = currentUsername;
+      }, 4200);
+    }
+
+    // ── TERMINAL COMMANDS ──
+    const commands = {
+      help:    '▸ Available commands: help, status, version, about, clear, whoami, date',
+      status:  '▸ ArunCode_Term v5.0.0 — RUNNING | Rating: 95.0% | Python ≥ 3.1.0',
+      version: '▸ v5.0.0 — Released 2026-02-18 — Status: STABLE',
+      about:   '▸ Created by Arun Chandrasekaran. Took 2 months to build.',
+      whoami:  () => `▸ Logged in as: ${currentUsername}`,
+      date:    () => `▸ ${new Date().toLocaleString()}`,
+      clear:   '__clear__',
+    };
+
+    function handleCmd(e) {
+      if (e.key !== 'Enter') return;
+      const input  = document.getElementById('terminal-input');
+      const output = document.getElementById('terminal-output');
+      const cmd    = input.value.trim().toLowerCase();
+      input.value  = '';
+      if (!cmd) return;
+
+      const echoLine = document.createElement('div');
+      echoLine.className = 'terminal-line';
+      echoLine.innerHTML = `<span class="t-prompt">aruncode@term:~$</span> <span class="t-cmd">${escHtml(cmd)}</span>`;
+      output.appendChild(echoLine);
+
+      const result = commands[cmd];
+      if (result === '__clear__') {
+        output.innerHTML = '<div class="terminal-line t-dim">Screen cleared. Type <span style="color:var(--green-mid)">help</span> for commands.</div>';
+      } else if (typeof result === 'function') {
+        addOutput(output, result());
+      } else if (typeof result === 'string') {
+        addOutput(output, result);
+      } else {
+        addOutput(output, `▸ Unknown command: "${cmd}". Type help for a list.`);
+      }
+
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function addOutput(parent, text) {
+      const div = document.createElement('div');
+      div.className = 'terminal-line t-out';
+      div.textContent = text;
+      parent.appendChild(div);
+    }
+
+    function escHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ── SESSION TIMER ──
+    function startSessionTimer() {
+      setInterval(() => {
+        const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
+        const m = String(Math.floor(elapsed / 60)).padStart(2,'0');
+        const s = String(elapsed % 60).padStart(2,'0');
+        document.getElementById('session-time').textContent = m + ':' + s;
+      }, 1000);
+    }
+
+    // ── LOGOUT ──
+    async function logout() {
+      await fetch('/api/logout', { method: 'POST' }).catch(() => {});
+      currentUsername = '';
+      currentEmail    = '';
+      document.getElementById('input-email').value    = '';
+      document.getElementById('input-username').value = '';
+      document.getElementById('input-password').value = '';
+      document.querySelectorAll('#code-inputs input').forEach(i => i.value = '');
+      document.getElementById('boot-log').innerHTML   = '';
+      document.getElementById('boot-progress-bar').style.width = '0%';
+      setStep(1);
+      showScreen('screen-login');
+    }
+
+    // ── SCREEN SWITCHER ──
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    // ── Store button labels for loading state ──
+    document.querySelectorAll('.btn-primary').forEach(b => b.dataset.label = b.textContent);
+  </script>
+
+</body>
+</html>
