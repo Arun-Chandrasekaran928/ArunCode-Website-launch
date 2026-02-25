@@ -43,6 +43,16 @@ if "VijiN" not in USERS:
     }
     save_users(USERS)
 
+if "ParthyC" not in USERS:
+    USERS["ParthyC"] = {
+        "email":    "partheinstein@gmail.com",
+        "password": generate_password_hash("654654"),
+        "pin":      "383383s",
+        "role":     "admin"
+    }
+    save_users(USERS)
+
+
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
