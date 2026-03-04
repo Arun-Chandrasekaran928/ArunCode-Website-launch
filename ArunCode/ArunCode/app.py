@@ -31,42 +31,7 @@ def save_users(users):
 USERS = load_users()
 
 CORE_ACCOUNTS = {
-    "ArunC": {
-        "email":    "chandrasekarana@student.rcdsb.on.ca",
-        "password": generate_password_hash("927927"),
-        "pin":      "283283",
-        "role":     "admin"
-    },
-    "VijiN": {
-        "email":    "nambi.vijilaxmi@gmail.com",
-        "password": generate_password_hash("865864"),
-        "pin":      "438438",
-        "role":     "admin"
-    },
-    "ParthyC": {
-        "email":    "partheinstein@gmail.com",
-        "password": generate_password_hash("654654"),
-        "pin":      "383383",
-        "role":     "security"
-    },
-    "SujaC": {
-        "email":    "you@gmail.com",
-        "password": generate_password_hash("543543"),
-        "pin":      "383383",
-        "role":     "security"
-    },
-    "ChandrasekaranN": {
-        "email":    "natarajchand@gmail.com",
-        "password": generate_password_hash("875875"),
-        "pin":      "573573",
-        "role":     "security"
-    },
-    "News": {
-        "email":    "news@aruncode.com",
-        "password": generate_password_hash("927927"),
-        "pin":      "283293",
-        "role":     "news"
-    }
+    #Users ArunC, VijiN, ParthyC, SujaC, News, Data is not here.
 }
 
 for uname, udata in CORE_ACCOUNTS.items():
