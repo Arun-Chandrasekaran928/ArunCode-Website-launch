@@ -333,6 +333,37 @@
       box-shadow: 0 0 6px var(--green-dim);
       margin-left: 4px;
     }
+
+    /* email card - amber */
+    .card-email {
+      border-color: #3a2a00;
+      background: rgba(255,179,0,0.03);
+    }
+    .card-email:hover {
+      border-color: #ffb300;
+      background: rgba(255,179,0,0.06);
+    }
+    .card-email::after { background: #ffb300; }
+    .card-email .card-tag { color: #7a5500; border-color: #7a5500; }
+    .card-email .card-name { color: #ffb300; }
+    .card-email .card-meta { color: #7a5500; }
+
+    /* ptc card - purple */
+    .card-ptc {
+      border-color: #2a1a3a;
+      background: rgba(192,132,252,0.03);
+    }
+    .card-ptc:hover {
+      border-color: #c084fc;
+      background: rgba(192,132,252,0.06);
+    }
+    .card-ptc::after { background: #c084fc; }
+    .card-ptc .card-tag { color: #6a3a9a; border-color: #6a3a9a; }
+    .card-ptc .card-name { color: #c084fc; }
+    .card-ptc .card-meta { color: #6a3a9a; }
+
+    /* 4-col grid */
+    .cards { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); max-width: 1000px; }
   </style>
 </head>
 <body>
@@ -356,7 +387,7 @@
     <div class="cards">
 
       <!-- ArunCode_Term -->
-      <a class="app-card card-term" href="home.html">
+      <a class="app-card card-term" href="/terminal">
         <div class="card-tag">terminal app</div>
         <div class="card-icon">&gt;_</div>
         <div class="card-name">ArunCode_Term</div>
@@ -377,7 +408,37 @@
         <div class="card-name">ArunCode IDE</div>
         <div class="card-desc">
           A full code editor and IDE environment.<br>
-          Write, edit, and run your code projects.
+          Write, edit, run and save your code projects.
+        </div>
+        <div class="card-meta">
+          <div>STATUS: <span>RUNNING</span> &nbsp;·&nbsp; v1.0.0</div>
+          <div class="card-arrow">↗</div>
+        </div>
+      </a>
+
+      <!-- ArunCode Emails -->
+      <a class="app-card card-email" href="/emails">
+        <div class="card-tag">communications</div>
+        <div class="card-icon">@</div>
+        <div class="card-name">ArunCode_Emails</div>
+        <div class="card-desc">
+          Send and receive emails from within ArunCode.<br>
+          Manage your inbox and compose messages.
+        </div>
+        <div class="card-meta">
+          <div>STATUS: <span>RUNNING</span> &nbsp;·&nbsp; v1.0.0</div>
+          <div class="card-arrow">↗</div>
+        </div>
+      </a>
+
+      <!-- Python Teaching Club -->
+      <a class="app-card card-ptc" href="/ptc">
+        <div class="card-tag">education</div>
+        <div class="card-icon">&#x1F40D;</div>
+        <div class="card-name">Python Teaching Club</div>
+        <div class="card-desc">
+          Learn and teach Python together.<br>
+          Lessons, exercises and a coding community.
         </div>
         <div class="card-meta">
           <div>STATUS: <span>RUNNING</span> &nbsp;·&nbsp; v1.0.0</div>

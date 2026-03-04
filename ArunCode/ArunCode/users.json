@@ -1,26 +1,44 @@
 {
   "ArunC": {
     "email": "chandrasekarana@student.rcdsb.on.ca",
-    "password": "pbkdf2:sha256:260000$QY7mSYtBGzIonEaT$82913392a3dcfff34ad0d6a1498ea817d534b16d6f158cadde91ad3037000dac",
+    "password": "scrypt:32768:8:1$SfSa2Nj2hqYf4nAO$73907e4817e82fc7187998c7e9c7cb9500c5ff3528ddd928808dd14b7141885da700261e74964718d108f27bdb83740bdf1e0d0c52cf5093df1b266338e6a4f4",
     "pin": "283283",
     "role": "admin"
   },
-  "cooluser123": {
-    "email": "you@example.com",
-    "password": "pbkdf2:sha256:260000$8W1GksWPXo6aWgys$4c2f4597c72aba0c1f5e75369e9ca1d8e63e6adf24163d1f6eab4ada51b27da6",
-    "pin": "",
-    "role": "user"
-  },
-  "HeyMan!": {
-    "email": "orange@gmail.com",
-    "password": "pbkdf2:sha256:260000$fzilwtJZdwOnxvvh$876b65d00e5f6c4cae15cc1e7db2cc7df7db9c896471c900a621488bf4764591",
-    "pin": "",
-    "role": "user"
-  },
   "VijiN": {
     "email": "nambi.vijilaxmi@gmail.com",
-    "password": "pbkdf2:sha256:260000$FRNNhShjNQqPKVYe$e19281a0332b513db220f91e444b754334d9efe34a0298f1025e98d576fbac1c",
+    "password": "scrypt:32768:8:1$XsS6JPgK1zvkpdAO$ad453887da984d45c976e6958d3f18cf032eee14ad90d4229d24eb45d47eb74839ffa4dd9a3c89d795b33c1b043a352dd377b7edd970aca02161d3583ed2f198",
     "pin": "438438",
     "role": "admin"
+  },
+  "ParthyC": {
+    "email": "partheinstein@gmail.com",
+    "password": "scrypt:32768:8:1$bwWiBGxmyEqMRUXR$aee8d639dfe721278dd4c6bb9e3d8d126def478c54561ee950aad12d3e3acd8823cae3852b08d78d376147183f157efca930cfbb040db49044811dd6433e95bd",
+    "pin": "383383",
+    "role": "security"
+  },
+  "SujaC": {
+    "email": "you@gmail.com",
+    "password": "scrypt:32768:8:1$icnpXoqfiuDxNM4u$b1900bd1e11335911ff5f7b1d1701cd1cd9d2fab7526a09bf2f2b50b72f3425323cd333e95bb5ec3a801e719947e04a663c685276e78deae95b0175947062d78",
+    "pin": "383383",
+    "role": "security"
+  },
+  "ChandrasekaranN": {
+    "email": "natarajchand@gmail.com",
+    "password": "scrypt:32768:8:1$lHrGfVD4MA9Zk2Hw$9d1ad658259264c650cdf581327bd82b5a920f29470b9f4416ff98b558a302acc2d3d84975d12c24f6b694184a11bf6eacdccb8eef41f7e825334e51d3b2a7d1",
+    "pin": "573573",
+    "role": "security"
+  },
+  "ArunCodeNews": {
+    "email": "news@aruncode.com",
+    "password": "scrypt:32768:8:1$f6poj3qkC27fIpYF$b3db4b3d3ea0cc60f6ee180aa0a11a994a4a81d117b918b20c659f1cb0f7cafb034f55606dd1ddf4e23e6a6663848295aa7c9272a341c5172f6992f72cbc7107",
+    "pin": "283283",
+    "role": "news"
+  },
+  "News": {
+    "email": "news@aruncode.com",
+    "password": "scrypt:32768:8:1$rrqrNo3V3iXENoty$f5119144c1e730a1647d175c1dd4202b35c882eb4c653b621ecdae038ec1609059cc468e5d84e80fc5d1bad07e4fa016190b8c6940d9c524ed0b388e5a524056",
+    "pin": "283293",
+    "role": "news"
   }
 }

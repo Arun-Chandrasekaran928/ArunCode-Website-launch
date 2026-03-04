@@ -477,7 +477,7 @@
             <div class="ql-arrow">↗</div>
           </a>
           <a class="quick-link" href="/about/about.html">
-            <div class="ql-icon">👤</div>
+            <div class="ql-icon">ℹ</div>
             <div class="ql-info">
               <div class="ql-title">About</div>
               <div class="ql-desc">Creator & ArunCode_Term story</div>
@@ -489,6 +489,86 @@
             <div class="ql-info">
               <div class="ql-title">ArunCode IDE</div>
               <div class="ql-desc">Open the code editor</div>
+            </div>
+            <div class="ql-arrow">↗</div>
+          </a>
+          <a class="quick-link" href="/emails">
+            <div class="ql-icon">✉</div>
+            <div class="ql-info">
+              <div class="ql-title">Emails</div>
+              <div class="ql-desc">Send & receive messages</div>
+            </div>
+            <div class="ql-arrow">↗</div>
+          </a>
+          <a class="quick-link" href="/ptc">
+            <div class="ql-icon">🐍</div>
+            <div class="ql-info">
+              <div class="ql-title">Python Teaching Club</div>
+              <div class="ql-desc">Lessons, quizzes & members</div>
+            </div>
+            <div class="ql-arrow">↗</div>
+          </a>
+          <a class="quick-link" href="/github">
+            <div class="ql-icon">🐙</div>
+            <div class="ql-info">
+              <div class="ql-title">ArunCode Github</div>
+              <div class="ql-desc">Repos, code & version control</div>
+            </div>
+            <div class="ql-arrow">↗</div>
+          </a>
+          <a class="quick-link" href="/docs">
+            <div class="ql-icon">📄</div>
+            <div class="ql-info">
+              <div class="ql-title">Docs</div>
+              <div class="ql-desc">Guides and documentation</div>
+            </div>
+            <div class="ql-arrow">↗</div>
+          </a>
+          <a class="quick-link" href="/news">
+            <div class="ql-icon">📰</div>
+            <div class="ql-info">
+              <div class="ql-title">ArunCode News</div>
+              <div class="ql-desc">Latest announcements</div>
+            </div>
+            <div class="ql-arrow">↗</div>
+          </a>
+          <a class="quick-link" href="/github">
+            <div class="ql-icon">🐙</div>
+            <div class="ql-info">
+              <div class="ql-title">ArunCode_Github</div>
+              <div class="ql-desc">Repos, code & profiles</div>
+            </div>
+            <div class="ql-arrow">↗</div>
+          </a>
+          <a class="quick-link" href="/profile">
+            <div class="ql-icon">👤</div>
+            <div class="ql-info">
+              <div class="ql-title">Profile</div>
+              <div class="ql-desc">Change name, email, password, PIN</div>
+            </div>
+            <div class="ql-arrow">↗</div>
+          </a>
+          <a class="quick-link" href="/news">
+            <div class="ql-icon">📰</div>
+            <div class="ql-info">
+              <div class="ql-title">ArunCode News</div>
+              <div class="ql-desc">Latest announcements</div>
+            </div>
+            <div class="ql-arrow">↗</div>
+          </a>
+          <a class="quick-link" id="link-security" href="/security" style="display:none">
+            <div class="ql-icon">🔒</div>
+            <div class="ql-info">
+              <div class="ql-title">Security Manager</div>
+              <div class="ql-desc">Users, logs & threat monitor</div>
+            </div>
+            <div class="ql-arrow" style="color:var(--red)">↗</div>
+          </a>
+          <a class="quick-link" id="link-admin" href="/admin" style="display:none">
+            <div class="ql-icon">⚙</div>
+            <div class="ql-info">
+              <div class="ql-title">Admin Panel</div>
+              <div class="ql-desc">Manage accounts</div>
             </div>
             <div class="ql-arrow">↗</div>
           </a>
@@ -574,6 +654,13 @@
 
     // ── USERNAME ──
     const stored = sessionStorage.getItem('aruncode_user') || 'ArunC';
+    const role   = sessionStorage.getItem('aruncode_role') || 'user';
+    if (role === 'security' || role === 'admin') {
+      document.getElementById('link-security').style.display = '';
+    }
+    if (role === 'admin') {
+      document.getElementById('link-admin').style.display = '';
+    }
     document.getElementById('username-display').textContent = stored;
     document.getElementById('hero-name').textContent = stored;
 
